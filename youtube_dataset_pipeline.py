@@ -9,7 +9,7 @@ from googleapiclient.errors import HttpError
 import numpy as np
 
 # --- Configuration ---
-API_KEY = os.environ.get("YOUTUBE_API_KEY", "AIzaSyBV5VN40HOWGO9sPUSj3rsESMzRvxs79EQ")  # Use env var or fallback
+API_KEY = os.environ.get("YOUTUBE_API_KEY")  # Use env var or fallback
 YOUTUBE_API_SERVICE_NAME = "youtube"
 YOUTUBE_API_VERSION = "v3"
 
