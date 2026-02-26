@@ -1,0 +1,52 @@
+name: Generate Dataset
+
+on:
+  schedule:
+    - cron: '0 0 * * *' # Run daily at midnight
+  workflow_dispatch: # Allow manual trigger
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write # Important: Allows the action to push changes
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install dependencies
+        run: |
+          pip install -r requirements.txt
+
+      - name: Run data generation script
+        run: |
+          python youtube_dataset_pipeline.py
+        # Ensure your script generates the CSV files here
+
+      - name: Commit and push changes
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          git config --global user.name 'github-actions[bot]'
+          git config --global user.email 'github-actions[bot]@users.noreply.github.com'
+          
+          # Force add the generated files because they are in .gitignore
+          git add -f *.csv
+          
+          # Check if there are changes to commit
+          if git diff --staged --quiet; then
+            echo "No changes to commit"
+            exit 0
+          fi
+          
+          git commit -m "Auto-generated dataset [skip ci]"
+          
+          # Push to a specific branch (e.g., 'data-updates') so you can merge it later
+          # checking if branch exists or creating new one
+          git push origin HEAD:data-updates
